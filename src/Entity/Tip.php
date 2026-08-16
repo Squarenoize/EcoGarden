@@ -14,8 +14,8 @@ class Tip
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $tipText = null;
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $text = null;
@@ -29,14 +29,14 @@ class Tip
         return $this->id;
     }
 
-    public function getTipText(): ?string
+    public function getTitle(): ?string
     {
-        return $this->tipText;
+        return $this->title;
     }
 
-    public function setTipText(string $tipText): static
+    public function setTitle(string $title): static
     {
-        $this->tipText = $tipText;
+        $this->title = $title;
 
         return $this;
     }
