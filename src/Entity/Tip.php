@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TipRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TipRepository::class)]
 class Tip
@@ -12,16 +13,20 @@ class Tip
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getTips'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getTips'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['getTips'])]
     private ?string $text = null;
 
     #[ORM\ManyToOne(inversedBy: 'tips')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['getTips'])]
     private ?Month $month = null;
 
     public function getId(): ?int

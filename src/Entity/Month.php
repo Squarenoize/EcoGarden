@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MonthRepository::class)]
 class Month
@@ -17,9 +18,11 @@ class Month
     private ?int $id = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Groups(['getTips'])]
     private ?int $number = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getTips'])]
     private ?string $name = null;
 
     /**
