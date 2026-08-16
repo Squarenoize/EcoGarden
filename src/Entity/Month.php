@@ -28,7 +28,7 @@ class Month
     /**
      * @var Collection<int, Tip>
      */
-    #[ORM\OneToMany(targetEntity: Tip::class, mappedBy: 'month')]
+    #[ORM\ManyToMany(targetEntity: Tip::class, mappedBy: 'months')]
     private Collection $tips;
 
     public function __construct()
@@ -77,7 +77,7 @@ class Month
     {
         if (!$this->tips->contains($tip)) {
             $this->tips->add($tip);
-            $tip->setMonth($this);
+            $tip->getMonths()->add($this);
         }
 
         return $this;
@@ -87,8 +87,8 @@ class Month
     {
         if ($this->tips->removeElement($tip)) {
             // set the owning side to null (unless already changed)
-            if ($tip->getMonth() === $this) {
-                $tip->setMonth(null);
+            if ($tip->getMonths()->contains($this)) {
+                $tip->getMonths()->removeElement($this);
             }
         }
 

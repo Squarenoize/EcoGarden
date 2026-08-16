@@ -39,7 +39,16 @@ class AppFixtures extends Fixture
             $tip = new Tip();
             $tip->setTitle("Conseil  $i");
             $tip->setText("Ceci est le texte du conseil $i.");
-            $tip->setMonth($monthEntities[array_rand($monthEntities)]);
+            
+            // Associer 1 à 3 mois consécutifs à chaque conseil
+            $numberOfMonths = rand(1, 3);
+            $startIndex = rand(0, 11); // 0 à 11 pour les 12 mois
+            
+            for ($j = 0; $j < $numberOfMonths; $j++) {
+                // Utiliser modulo pour boucler (nov, déc, jan par exemple)
+                $monthIndex = ($startIndex + $j) % 12;
+                $tip->addMonth($monthEntities[$monthIndex]);
+            }
             
             $manager->persist($tip);
         }

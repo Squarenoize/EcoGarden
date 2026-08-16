@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\TipRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -24,10 +26,15 @@ class Tip
     #[Groups(['getTips'])]
     private ?string $text = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tips')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToMany(targetEntity: Month::class, inversedBy: 'tips')]
+    #[ORM\JoinTable(name: 'tip_month')]
     #[Groups(['getTips'])]
-    private ?Month $month = null;
+    private Collection $months;
+
+    public function __construct()
+    {
+        $this->months = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -58,14 +65,23 @@ class Tip
         return $this;
     }
 
-    public function getMonth(): ?Month
+    public function getMonths(): Collection
     {
-        return $this->month;
+        return $this->months;
     }
 
-    public function setMonth(?Month $month): static
+    public function addMonth(Month $month): static
     {
-        $this->month = $month;
+        if (!$this->months->contains($month)) {
+            $this->months->add($month);
+        }
+
+        return $this;
+    }
+
+    public function removeMonth(Month $month): static
+    {
+        $this->months->removeElement($month);
 
         return $this;
     }
