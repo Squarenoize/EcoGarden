@@ -24,6 +24,7 @@ final class ExceptionListener
             $data = [
                 'status' => 500,
                 'message' => 'Une erreur est survenue.',
+                'debug' => $exception->getMessage(),
             ];
             $event->setResponse(new JsonResponse($data));
         }

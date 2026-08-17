@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TipRepository::class)]
 class Tip
@@ -20,15 +21,31 @@ class Tip
 
     #[ORM\Column(length: 255)]
     #[Groups(['getTips'])]
+    #[Assert\NotBlank(
+        message: 'Le titre du conseil ne peut pas être vide.'
+    )]
+    #[Assert\Length(
+        min: 3,
+        minMessage: 'Le titre du conseil doit contenir au moins {{ limit }} caractère.',
+        max: 255,
+        maxMessage: 'Le titre du conseil ne peut pas dépasser {{ limit }} caractères.'
+    )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['getTips'])]
+    #[Assert\NotBlank(
+        message: 'Le texte du conseil ne peut pas être vide.'
+    )]
     private ?string $text = null;
 
     #[ORM\ManyToMany(targetEntity: Month::class, inversedBy: 'tips')]
     #[ORM\JoinTable(name: 'tip_month')]
     #[Groups(['getTips'])]
+    #[Assert\Count(
+        min: 1,
+        minMessage: 'Vous devez sélectionner au moins un mois pour ce conseil.'
+    )]
     private Collection $months;
 
     public function __construct()
