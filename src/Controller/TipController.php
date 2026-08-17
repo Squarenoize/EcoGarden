@@ -44,14 +44,11 @@ final class TipController extends AbstractController
     #[Route('/api/tips', name: 'createTip', methods: ['POST'])]
     public function createTip(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        // Extract month before deserialze the JSON data into a Tip entity
-        $monthsData = $data['months'] ?? [];
-        unset($data['months']); // Remove months from data to avoid deserialization issues
+        $requestData = $this->extractMonthsFromRequest(json_decode($request->getContent(), true));
 
-        $tip = $serializer->deserialize(json_encode($data), Tip::class, 'json');
-        
-        foreach ($monthsData as $monthNumber) {
+        $tip = $serializer->deserialize(json_encode($requestData['data']), Tip::class, 'json');
+
+        foreach ($requestData['months'] as $monthNumber) {
             $month = $entityManager->getRepository(Month::class)->findOneBy(['number' => $monthNumber]);
             if ($month) {
                 $tip->addMonth($month);
@@ -67,5 +64,52 @@ final class TipController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Le conseil a été créé avec succès.'], JsonResponse::HTTP_CREATED);
+    }
+
+    #[Route('/api/tips/{id}', name: 'deleteTip', methods: ['DELETE'])]
+    public function deleteTip(Tip $tip, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $entityManager->remove($tip);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Le conseil a été supprimé avec succès.'], JsonResponse::HTTP_OK);
+    }
+
+    #[Route('/api/tips/{id}', name: 'updateTip', methods: ['PUT'])]
+    public function updateTip(Request $request, Tip $tip, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
+    {
+        $requestData = $this->extractMonthsFromRequest(
+        json_decode($request->getContent(), true)
+        );
+
+        $tip = $serializer->deserialize(json_encode($requestData['data']), Tip::class, 'json', ['object_to_populate' => $tip]);
+
+        foreach ($requestData['months'] as $monthNumber) {
+            $month = $entityManager->getRepository(Month::class)->findOneBy(['number' => $monthNumber]);
+            if ($month) {
+                $tip->addMonth($month);
+            }
+        }
+
+        $errors = $validator->validate($tip);
+        if (count($errors) > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $entityManager->persist($tip);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Le conseil a été mis à jour avec succès.'], JsonResponse::HTTP_OK);
+    }
+
+    private function extractMonthsFromRequest(array $data): array
+    {
+        $monthsData = $data['months'] ?? [];
+        unset($data['months']);
+        
+        return [
+            'data' => $data,
+            'months' => $monthsData
+        ];
     }
 }
