@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Month;
 use App\Repository\TipRepository;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 final class TipController extends AbstractController
 {
@@ -22,9 +24,10 @@ final class TipController extends AbstractController
     }
 
     #[Route('/api/tips/{monthNumber}', name: 'tipsListByMonth', methods: ['GET'])]
-    public function getTipsListByMonth(int $monthNumber, TipRepository $tipRepository, SerializerInterface $serializer): JsonResponse
+    #[ParamConverter('month', options: ['mapping' => ['monthNumber' => 'number']])]
+    public function getTipsListByMonth(Month $month, TipRepository $tipRepository, SerializerInterface $serializer): JsonResponse
     {
-        $tipsList = $tipRepository->findByMonth($monthNumber);
+        $tipsList = $tipRepository->findByMonth($month->getNumber());
         $jsonTipsList = $serializer->serialize($tipsList, 'json', ['groups' => 'getTips']);
         
         if (empty($tipsList)) {
