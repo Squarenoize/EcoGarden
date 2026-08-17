@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as AppAssert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -33,6 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'Le rôle ne peut pas être vide.')]
     #[Assert\Choice(
         choices: ['ROLE_USER', 'ROLE_ADMIN'],
+        multiple: true,
         message: 'Le rôle doit être ROLE_USER ou ROLE_ADMIN.'
     )]
     private array $roles = [];
@@ -58,6 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         pattern: '/^\d{5}$/',
         message: 'Le code postal doit être un nombre à 5 chiffres.'
     )]
+    #[AppAssert\ValidZipCode]
     private ?int $zipCode = null;
 
     public function getId(): ?int

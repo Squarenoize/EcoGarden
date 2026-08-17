@@ -75,7 +75,7 @@ final class TipController extends AbstractController
         $entityManager->remove($tip);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'Le conseil a été supprimé avec succès.'], JsonResponse::HTTP_OK);
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/tips/{id}', name: 'updateTip', methods: ['PUT'])]
