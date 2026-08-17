@@ -4,13 +4,36 @@ namespace App\DataFixtures;
 
 use App\Entity\Month;
 use App\Entity\Tip;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
     public function load(ObjectManager $manager): void
     {
+        $user = new User();
+        $user->setEmail('user@ecogarden.com');
+        $user->setRoles(['ROLE_USER']);
+        $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
+        $user->setZipCode('75001');
+        $manager->persist($user);
+
+        $admin = new User();
+        $admin->setEmail('admin@ecogarden.com');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
+        $admin->setZipCode('46230');
+        $manager->persist($admin);
+
         $months = [
             ['number' => 1, 'name' => 'Janvier'],
             ['number' => 2, 'name' => 'Février'],
