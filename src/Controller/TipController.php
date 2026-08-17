@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 final class TipController extends AbstractController
 {
@@ -42,6 +43,7 @@ final class TipController extends AbstractController
     }
 
     #[Route('/api/tips', name: 'createTip', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous devez être administrateur pour créer un conseil.')]
     public function createTip(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $requestData = $this->extractMonthsFromRequest(json_decode($request->getContent(), true));
@@ -67,6 +69,7 @@ final class TipController extends AbstractController
     }
 
     #[Route('/api/tips/{id}', name: 'deleteTip', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous devez être administrateur pour supprimer un conseil.')]
     public function deleteTip(Tip $tip, EntityManagerInterface $entityManager): JsonResponse
     {
         $entityManager->remove($tip);
@@ -76,6 +79,7 @@ final class TipController extends AbstractController
     }
 
     #[Route('/api/tips/{id}', name: 'updateTip', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Vous devez être administrateur pour mettre à jour un conseil.')]
     public function updateTip(Request $request, Tip $tip, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
         $requestData = $this->extractMonthsFromRequest(
