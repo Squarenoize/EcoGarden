@@ -63,6 +63,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[AppAssert\ValidZipCode]
     private ?int $zipCode = null;
 
+    #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le code INSEE ne peut pas être vide.')]
+    #[Assert\Regex(
+        pattern: '/^\d{5}$/',
+        message: 'Le code INSEE doit être un nombre à 5 chiffres.'
+    )]
+    #[AppAssert\ValidInsee]
+    private ?int $insee = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -149,4 +158,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /* public function getUsername(): string {
         return $this->getUserIdentifier();
     }*/
+
+    public function getInsee(): ?int
+    {
+        return $this->insee;
+    }
+
+    public function setInsee(int $insee): static
+    {
+        $this->insee = $insee;
+
+        return $this;
+    }
 }

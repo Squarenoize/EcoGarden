@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class UserController extends AbstractController
 {
     #[Route('/api/user', name: 'createUser', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous devez être administrateur pour créer un utilisateur.')]
     public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
