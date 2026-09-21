@@ -1,15 +1,15 @@
 <?php
 namespace App\Validator\Constraints;
 
+use App\Service\ExternalApiService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ValidInseeValidator extends ConstraintValidator
 {
     public function __construct(
-        private HttpClientInterface $httpClient
+        private ExternalApiService $externalApiService
     ) {}
 
     public function validate($value, Constraint $constraint): void
@@ -23,13 +23,13 @@ class ValidInseeValidator extends ConstraintValidator
         }
 
         try {
-            $response = $this->httpClient->request(
-                'GET', 
-                "https://apicarto.ign.fr/api/cadastre/commune?code_insee={$value}",
-            );
-            
-            // If code 400 response, it means the INSEE code is invalid
-            if (400 === $response->getStatusCode()) {
+            $response = $this->externalApiService->getInsee((int) $value);
+
+            $data = $response->toArray(false);
+            $isInvalid = $response->getStatusCode() >= 400
+                || 0 === (int) ($data['numberMatched'] ?? 0);
+
+            if ($isInvalid) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', (string) $value)
                     ->addViolation();

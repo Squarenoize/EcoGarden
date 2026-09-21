@@ -1,15 +1,15 @@
 <?php
 namespace App\Validator\Constraints;
 
+use App\Service\ExternalApiService;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ValidZipCodeValidator extends ConstraintValidator
 {
     public function __construct(
-        private HttpClientInterface $httpClient
+        private ExternalApiService $externalApiService
     ) {}
 
     public function validate($value, Constraint $constraint): void
@@ -23,14 +23,9 @@ class ValidZipCodeValidator extends ConstraintValidator
         }
 
         try {
-            $response = $this->httpClient->request(
-                'GET', 
-                "https://apicarto.ign.fr/api/codes-postaux/communes/{$value}",
-            );
-            
-
+            $response = $this->externalApiService->getZipCode((int) $value);
             $data = $response->toArray();
-            
+
             if (empty($data)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', (string) $value)

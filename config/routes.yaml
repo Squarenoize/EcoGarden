@@ -6,4 +6,5 @@ controllers:
 
 api_login_check:
     path: /api/auth
+    methods: [POST]
 
