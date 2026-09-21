@@ -82,16 +82,24 @@ final class TipController extends AbstractController
     #[IsGranted('ROLE_ADMIN', message: 'Vous devez être administrateur pour mettre à jour un conseil.')]
     public function updateTip(Request $request, Tip $tip, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
-        $requestData = $this->extractMonthsFromRequest(
-        json_decode($request->getContent(), true)
-        );
+        $decodedData = json_decode($request->getContent(), true) ?? [];
+        $monthsProvided = array_key_exists('months', $decodedData);
+
+        $requestData = $this->extractMonthsFromRequest($decodedData);
 
         $tip = $serializer->deserialize(json_encode($requestData['data']), Tip::class, 'json', ['object_to_populate' => $tip]);
 
-        foreach ($requestData['months'] as $monthNumber) {
-            $month = $entityManager->getRepository(Month::class)->findOneBy(['number' => $monthNumber]);
-            if ($month) {
-                $tip->addMonth($month);
+        // Only replace months if explicitly sent, otherwise keep the existing ones untouched
+        if ($monthsProvided) {
+            foreach ($tip->getMonths()->toArray() as $existingMonth) {
+                $tip->removeMonth($existingMonth);
+            }
+
+            foreach ($requestData['months'] as $monthNumber) {
+                $month = $entityManager->getRepository(Month::class)->findOneBy(['number' => $monthNumber]);
+                if ($month) {
+                    $tip->addMonth($month);
+                }
             }
         }
 
