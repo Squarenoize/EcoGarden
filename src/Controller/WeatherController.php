@@ -28,7 +28,7 @@ final class WeatherController extends AbstractController
             return $externalApiService->getWeather((int)$insee)->toArray();
         });
 
-        return $this->json([
+        return new JsonResponse([
             'message' => "Météo pour le code INSEE {$insee}",
             'weather' => $cityWeatherJson,
         ]);
@@ -54,7 +54,7 @@ final class WeatherController extends AbstractController
             $item->expiresAfter(900); // Cache for 15 minutes
             return $externalApiService->getWeather($insee)->toArray();
         });
-        return $this->json([
+        return new JsonResponse([
             'message' => "Météo pour le code INSEE {$insee}",
             'weather' => $cityWeatherJson,
         ]);
