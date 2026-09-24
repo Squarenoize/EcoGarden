@@ -11,9 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class TipController extends AbstractController
 {
@@ -29,8 +29,7 @@ final class TipController extends AbstractController
     }
 
     #[Route('/api/tips/{monthNumber}', name: 'tipsListByMonth', methods: ['GET'])]
-    #[ParamConverter('month', options: ['mapping' => ['monthNumber' => 'number']])]
-    public function getTipsListByMonth(Month $month, TipRepository $tipRepository, SerializerInterface $serializer): JsonResponse
+    public function getTipsListByMonth(#[MapEntity(mapping: ['monthNumber' => 'number'])] Month $month, TipRepository $tipRepository, SerializerInterface $serializer): JsonResponse
     {
         $tipsList = $tipRepository->findByMonth($month->getNumber());
         $jsonTipsList = $serializer->serialize($tipsList, 'json', ['groups' => 'getTips']);
