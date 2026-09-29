@@ -23,13 +23,13 @@ class AppFixtures extends Fixture
         $user = new User();
         $user->setEmail('user@ecogarden.com');
         $user->setRoles(['ROLE_USER']);
-        $user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
+        $user->setPassword($this->passwordHasher->hashPassword($user, 'Password123!'));
         $manager->persist($user);
 
         $admin = new User();
         $admin->setEmail('admin@ecogarden.com');
         $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
+        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'Password123!'));
         $manager->persist($admin);
 
         $months = [
