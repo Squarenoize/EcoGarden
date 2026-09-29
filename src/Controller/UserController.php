@@ -28,11 +28,14 @@ final class UserController extends AbstractController
         }
 
         $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+        $user->setRoles(['ROLE_USER']);
 
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return $this->json($user, JsonResponse::HTTP_CREATED);
+        $newUserEmail = $user->getEmail();
+
+        return $this->json(['message' => "Votre compte utilisateur ({$newUserEmail}) a été créé avec succès."] );
     }
 
     #[Route('/api/user/{id}', name: 'updateUser', methods: ['PUT'])]

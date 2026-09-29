@@ -31,7 +31,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le rôle ne peut pas être vide.')]
     #[Assert\Choice(
         choices: ['ROLE_USER', 'ROLE_ADMIN'],
         multiple: true,
@@ -53,15 +52,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.'
     )]
     private ?string $password = null;
-
-    #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le code postal ne peut pas être vide.')]
-    #[Assert\Regex(
-        pattern: '/^\d{5}$/',
-        message: 'Le code postal doit être un nombre à 5 chiffres.'
-    )]
-    #[AppAssert\ValidZipCode]
-    private ?int $zipCode = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le code INSEE ne peut pas être vide.')]
@@ -140,18 +130,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
-    }
-
-    public function getZipCode(): ?int
-    {
-        return $this->zipCode;
-    }
-
-    public function setZipCode(int $zipCode): static
-    {
-        $this->zipCode = $zipCode;
-
-        return $this;
     }
 
     //for JWT

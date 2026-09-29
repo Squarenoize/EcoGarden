@@ -13,14 +13,6 @@ final class ExternalApiService
     ) {
     }
 
-    public function getZipCode(int $zipCode): ResponseInterface
-    {
-        return $this->httpClient->request(
-            'GET',
-            "https://apicarto.ign.fr/api/codes-postaux/communes/{$zipCode}"
-        );
-    }
-
     public function getInsee(int $insee): ResponseInterface
     {
         return $this->httpClient->request(
